@@ -1,3 +1,11 @@
+<<<<<<< HEAD
 altair
 pandas
 streamlit
+=======
+pandas
+scikit-learn
+scipy
+streamlit
+
+>>>>>>> 2ecfde2 (Modularizes the code)
