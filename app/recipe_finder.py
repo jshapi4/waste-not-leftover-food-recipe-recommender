@@ -52,6 +52,7 @@ def find_top_recipes(recipe_data, leftover_ingredients):
 
     # Limit the output to the top 10 recipes
     top_10_recipes = sorted_recipes.head(10)
+
     return top_10_recipes
 
 def calculate_leftover_usage(ingredients, leftover_set):

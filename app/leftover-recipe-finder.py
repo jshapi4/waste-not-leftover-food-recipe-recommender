@@ -125,7 +125,12 @@ if 'leftover_list' in st.session_state and st.session_state.leftover_list:
 if st.button('Find recipes!'):
     if 'leftover_list' in st.session_state:
         leftover_ingredients = st.session_state.leftover_list
-        top_10_recipes = find_top_recipes(leftover_ingredients)
+
+        # Calculate cosine similarity scores
+        recipe_data_exp = calculate_cosine_similarity(recipe_data, leftover_ingredients)
+
+        # Find top recipes based on combined score
+        top_10_recipes = find_top_recipes(recipe_data_exp, leftover_ingredients)
 
         # Display the top 10 recipes with their combined scores
         st.header('Top 10 Recipes For You:')
