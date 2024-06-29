@@ -7,57 +7,18 @@ def display_ingredients_list(ingredients):
         for item in ingredients:
             st.markdown(f"- {item}")
 
-# def display_top_recipes(top_10_recipes):
-#     st.header('Top 10 Recipes For You:')
-#     for i, (index, row) in enumerate(top_10_recipes.iterrows(), 1):
-#         with st.expander(f"#{i}: {row['Recipe Name']}"):
-#             ingredient_list = row['Ingredients']
-#             st.write("Ingredients:")
-#             for ingredient in ingredient_list:
-#                 st.markdown(f"- {ingredient}")
-#             st.write(f"Combined Score: {(row['Combined Score'] * 100):.2f} out of 100")
-#             st.write(f"Normalized Cosine Similarity Score: {(row['Normalized Cosine Similarity'] * 100):.2f}%")
-#             st.write(f"Leftover Usage Percentage: {row['Leftover Usage Percentage']:.2f}%")
-#             st.write(f"Ingredients Intersection: {row['Ingredient Intersection']}")
-#             if row['Unused Leftovers']:
-#                 st.write(f"Unused Leftovers: {row['Unused Leftovers']}")
-#             else:
-#                 st.write(f"Unused Leftovers: None!")
-#             st.write(f"Ingredients Needed: {row['Ingredients Needed']}")
-
 def display_top_recipes(top_10_recipes):
     st.header('Top 10 Recipes For You:')
     for i, (index, row) in enumerate(top_10_recipes.iterrows(), 1):
-        with st.expander(f"#{i}: {row['Recipe Name']}"):
-            # Display combined score with custom styling
-            with stylable_container(
-                    key=f"score_container_{i}",
-                    css_styles="""
-                    {
-                        background-color: #f0f0f0;
-                        border-radius: 10px;
-                        padding: 10px;
-                        text-align: center;
-                        justify-content: center;
-                        margin-bottom: 10px;
-                    }
-                    p {
-                        font-family: 'Helvetica', sans-serif;
-                        font-size: 16px;
-                        color: #053463;
-                        margin: 0;
-                    }
-                """
-            ):
-                st.markdown(f"<p>Combined Score: {(row['Combined Score'] * 100):.2f}/100</p>", unsafe_allow_html=True)
+        with st.expander(f"#{i}: {row['Recipe Name']} --- \t\t Match Score: {(row['Combined Score'] * 100):.2f}"):
 
             # Ingredients list
             st.subheader("Ingredients:")
             st.write(", ".join(row['Ingredients']))
 
             # Other scores
-            st.write(f"Normalized Cosine Similarity Score: {(row['Normalized Cosine Similarity'] * 100):.2f}%")
-            st.write(f"Leftover Usage Percentage: {row['Leftover Usage Percentage']:.2f}%")
+            # st.write(f"Normalized Cosine Similarity Score: {(row['Normalized Cosine Similarity'] * 100):.2f}%")
+            st.write(f"Leftover Usage: {row['Leftover Usage Percentage']:.2f}%")
 
             # Ingredients Intersection
             st.subheader("Ingredients Intersection:")
@@ -73,10 +34,3 @@ def display_top_recipes(top_10_recipes):
             # Ingredients Needed
             st.subheader("Ingredients Needed:")
             st.write(", ".join(row['Ingredients Needed']))
-
-def bootstrap_button(label, button_type):
-    return f'''
-    <button type="submit" class="btn btn-{button_type} btn-block w-100" style="height: 44px;">
-        {label}
-    </button>
-    '''

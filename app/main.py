@@ -1,7 +1,7 @@
 import streamlit as st
 from data_loader import cached_load_and_preprocess_data
 from recipe_finder import find_top_recipes
-from utils import display_ingredients_list, display_top_recipes, bootstrap_button
+from utils import display_ingredients_list, display_top_recipes
 import time
 
 # Global variable to hold the data
@@ -46,7 +46,7 @@ with st.form(key='ingredient_form'):
 display_ingredients_list(st.session_state.leftover_list)
 
 # Find recipes button and results
-if st.button('Find recipes!'):
+if st.button("Find recipes!", type="primary", use_container_width=True):
     progress_bar = st.progress(0)
     status_text = st.empty()
 
@@ -68,7 +68,7 @@ if st.button('Find recipes!'):
         status_text.text('Processing data...')
 
         for i in range(30, 60):
-            time.sleep(0.2)
+            time.sleep(0.05)
             progress_bar.progress(i)
 
         status_text.text('Calculating the best matches...')

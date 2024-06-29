@@ -2,10 +2,10 @@ import pandas as pd
 import streamlit as st
 import time
 
-def load_and_preprocess_data(file_path='/Users/joelshapiro/Documents/WGU/C964/Shapiro_Capstone/data/RAW_recipes_Food_com.csv', sample_size=1000):
+def load_and_preprocess_data(file_path, sample_size):
 
     # Set the maximum number of columns to display
-    #pd.set_option('display.max_columns', 50)
+    # pd.set_option('display.max_columns', 50)
 
     # Load the dataset from CSV file
     # sample ONLY
@@ -31,12 +31,4 @@ def clean_ingredients(ingredients_str):
 @st.cache_data(show_spinner=False)
 def cached_load_and_preprocess_data(file_path, sample_size):
     return load_and_preprocess_data(file_path, sample_size)
-
-def progress_bar():
-    progress_bar = st.progress(0)
-    status_text = st.empty()
-    status_text.text('Loading results...')
-    for i in range(1, 100):
-        time.sleep(0.05)
-        progress_bar.progress(i)
 
