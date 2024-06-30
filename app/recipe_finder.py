@@ -44,8 +44,13 @@ def find_top_recipes(recipe_data, leftover_ingredients):
     recipe_data_exp['Normalized Cosine Similarity'] = (recipe_data_exp['Cosine Similarity Score'] - recipe_data_exp['Cosine Similarity Score'].min()) / (recipe_data_exp['Cosine Similarity Score'].max() - recipe_data_exp['Cosine Similarity Score'].min())
     recipe_data_exp['Normalized Leftover Usage'] = recipe_data_exp['Leftover Usage Percentage'] / 100
 
-    # Combine the scores with equal weights (50% each)
-    recipe_data_exp['Combined Score'] = 0.4 * recipe_data_exp['Normalized Cosine Similarity'] + 0.6 * recipe_data_exp['Normalized Leftover Usage']
+    # find the ingredient use ratio
+    recipe_data_exp['Ingredients Use Count'] = recipe_data_exp['Ingredient Intersection'].apply(len)
+    recipe_data_exp['Ingredients Needed Count'] = recipe_data_exp['Ingredients Needed'].apply(len)
+    recipe_data_exp['Ingredient Ratio'] = recipe_data_exp['Ingredients Use Count'] / recipe_data_exp['Ingredients'].apply(len)
+
+    # Combine the scores with equal weights (1/3 each)
+    recipe_data_exp['Combined Score'] = (recipe_data_exp['Normalized Cosine Similarity'] + recipe_data_exp['Normalized Leftover Usage'] + recipe_data_exp['Ingredient Ratio']) / 3
 
     # Sort recipes by the combined score in descending order
     sorted_recipes = recipe_data_exp.sort_values(by='Combined Score', ascending=False)
@@ -53,8 +58,17 @@ def find_top_recipes(recipe_data, leftover_ingredients):
     # Limit the output to the top 10 recipes
     top_10_recipes = sorted_recipes.head(10)
 
-    return top_10_recipes
+    # Include necessary fields for radar chart
+    radar_chart_data = top_10_recipes[
+        ['Recipe Name', 'Cosine Similarity Score', 'Combined Score', 'Leftover Usage Percentage', 'Ingredients Needed',
+         'Ingredient Intersection', 'Ingredients Use Count', 'Ingredient Ratio']].copy()
+    #radar_chart_data['Ingredients Needed Count'] = radar_chart_data['Ingredients Needed'].apply(len)
+    #radar_chart_data['NumIngredUsed'] = radar_chart_data['Ingredient Intersection'].apply(len)
+    radar_chart_data['Leftover Usage Percentage'] /= 100
+    # radar_chart_data['Ingredient Ratio'] = radar_chart_data['NumIngredUsed'] / (
+    #         radar_chart_data['Ingredients Needed Count'] + radar_chart_data['NumIngredUsed'])
 
+    return top_10_recipes, radar_chart_data
 def calculate_leftover_usage(ingredients, leftover_set):
     ingredients_set = set(ingredients)
     intersection = ingredients_set.intersection(leftover_set)

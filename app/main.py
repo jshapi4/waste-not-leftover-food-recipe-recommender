@@ -1,7 +1,7 @@
 import streamlit as st
 from data_loader import cached_load_and_preprocess_data
 from recipe_finder import find_top_recipes
-from utils import display_ingredients_list, display_top_recipes
+from utils import *
 import time
 
 # Global variable to hold the data
@@ -17,6 +17,9 @@ if 'ingredient_input' not in st.session_state:
 if 'show_reset_button' not in st.session_state:
     st.session_state.show_reset_button = False
 
+if 'rerun_trigger' not in st.session_state:
+    st.session_state.rerun_trigger = 0
+
 # Function to add ingredient to the list
 def add_ingredient():
     if st.session_state.ingredient_input and st.session_state.ingredient_input not in st.session_state.leftover_list:
@@ -30,11 +33,17 @@ def reset_query():
 
 
 # Streamlit app
-st.image("./waste-not-logo.png", caption=None, use_column_width=True)
+st.set_page_config(
+    page_title="Waste Not: Leftover Ingredients Recipe Finder",
+    page_icon="🍽️",
+    layout="centered",
+    initial_sidebar_state="expanded",
+)
+
+banner_url = "https://i.postimg.cc/GpH7Ms1y/waste-not-banner.png"
+st.image(banner_url, caption=None, use_column_width=True)
 st.title('Waste Not: Leftover Ingredients Recipe Finder')
-st.markdown("""
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css" integrity="sha384-rbsA2VBKQhggwzxH7pPCaAqO46MgnOM80zW1RWuH61DGLwZJEdK2Kadq2F9CUG65" crossorigin="anonymous">
-    """, unsafe_allow_html=True)
+
 
 # Form for ingredient input
 with st.form(key='ingredient_form'):
@@ -42,8 +51,9 @@ with st.form(key='ingredient_form'):
     ingredient = st.text_input('Type an ingredient', key='ingredient_input')
     submit_button = st.form_submit_button(label='Add to list', on_click=add_ingredient)
 
-# Display the current list of ingredients
+# Display the current list of ingredients and handle editing
 display_ingredients_list(st.session_state.leftover_list)
+edit_ingredient_popup()
 
 # Find recipes button and results
 if st.button("Find recipes!", type="primary", use_container_width=True):
@@ -74,7 +84,7 @@ if st.button("Find recipes!", type="primary", use_container_width=True):
         status_text.text('Calculating the best matches...')
 
         # Calculate top 10
-        top_10_recipes = find_top_recipes(recipe_data, st.session_state.leftover_list)
+        top_10_recipes, radar_chart_data = find_top_recipes(recipe_data, st.session_state.leftover_list)
 
         progress_bar.progress(60)
 
@@ -88,8 +98,11 @@ if st.button("Find recipes!", type="primary", use_container_width=True):
         status_text.empty()
         progress_bar.empty()
 
-        # Display the top 10
-        display_top_recipes(top_10_recipes)
+        # Display the top 10 with radar charts
+        display_top_recipes(top_10_recipes, radar_chart_data)
+        # Display Bar Chart below the top 10
+        display_top_recipes_similarity_bar_chart(top_10_recipes)
+
 
         # Set flag to show reset button
         st.session_state.show_reset_button = True
