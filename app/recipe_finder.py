@@ -57,6 +57,8 @@ def find_top_recipes(recipe_data, leftover_ingredients):
 
     # Limit the output to the top 10 recipes
     top_10_recipes = sorted_recipes.head(10)
+    # return the top 100 for heatmap
+    top_1000_recipes = sorted_recipes.head(1000)
 
     # Include necessary fields for radar chart
     radar_chart_data = top_10_recipes[
@@ -68,7 +70,7 @@ def find_top_recipes(recipe_data, leftover_ingredients):
     # radar_chart_data['Ingredient Ratio'] = radar_chart_data['NumIngredUsed'] / (
     #         radar_chart_data['Ingredients Needed Count'] + radar_chart_data['NumIngredUsed'])
 
-    return top_10_recipes, radar_chart_data
+    return top_10_recipes, radar_chart_data, top_1000_recipes
 def calculate_leftover_usage(ingredients, leftover_set):
     ingredients_set = set(ingredients)
     intersection = ingredients_set.intersection(leftover_set)

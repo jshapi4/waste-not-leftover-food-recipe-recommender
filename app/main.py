@@ -65,7 +65,7 @@ if st.button("Find recipes!", type="primary", use_container_width=True):
         if recipe_data is None:
             recipe_data = cached_load_and_preprocess_data(
                 '/Users/joelshapiro/Documents/WGU/C964/Shapiro_Capstone/data/RAW_recipes_Food_com.csv',
-                1000
+                3000
             )
 
         # Simulate progress for loading the dataset
@@ -84,7 +84,7 @@ if st.button("Find recipes!", type="primary", use_container_width=True):
         status_text.text('Calculating the best matches...')
 
         # Calculate top 10
-        top_10_recipes, radar_chart_data = find_top_recipes(recipe_data, st.session_state.leftover_list)
+        top_10_recipes, radar_chart_data, top_1000_recipes = find_top_recipes(recipe_data, st.session_state.leftover_list)
 
         progress_bar.progress(60)
 
@@ -102,7 +102,8 @@ if st.button("Find recipes!", type="primary", use_container_width=True):
         display_top_recipes(top_10_recipes, radar_chart_data)
         # Display Bar Chart below the top 10
         display_top_recipes_similarity_bar_chart(top_10_recipes)
-
+        # 3rd Visualization
+        plot_similarity_vs_usage_scatter(top_1000_recipes)
 
         # Set flag to show reset button
         st.session_state.show_reset_button = True

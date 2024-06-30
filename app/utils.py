@@ -114,3 +114,16 @@ def display_top_recipes_similarity_bar_chart(top_10_recipes):
     plt.title('Top 10 Recipes by Cosine Similarity')
     plt.gca().invert_yaxis()
     st.pyplot(plt.gcf())
+
+
+# Function to plot the scatter plot
+def plot_similarity_vs_usage_scatter(top_recipes):
+    fig, ax = plt.subplots(figsize=(10, 6))
+    scatter = ax.scatter(top_recipes['Cosine Similarity Score'], top_recipes['Leftover Usage Percentage'],
+                         c=top_recipes['Combined Score'], cmap='viridis', s=100)
+    colorbar = plt.colorbar(scatter)
+    colorbar.set_label('Combined Score')
+    ax.set_xlabel('Cosine Similarity Score')
+    ax.set_ylabel('Leftover Usage Percentage')
+    ax.set_title('Cosine Similarity vs. Leftover Usage Percentage')
+    st.pyplot(fig)
