@@ -20,11 +20,13 @@ if 'show_reset_button' not in st.session_state:
 if 'rerun_trigger' not in st.session_state:
     st.session_state.rerun_trigger = 0
 
+
 # Function to add ingredient to the list
 def add_ingredient():
     if st.session_state.ingredient_input and st.session_state.ingredient_input not in st.session_state.leftover_list:
         st.session_state.leftover_list.append(st.session_state.ingredient_input)
         st.session_state.ingredient_input = ""
+
 
 # Function to reset the session state
 def reset_query():
@@ -64,9 +66,9 @@ if st.button("Find recipes!", type="primary", use_container_width=True):
         # Load data only when needed
         if recipe_data is None:
             recipe_data = cached_load_and_preprocess_data(
-                '/Users/joelshapiro/Documents/WGU/C964/Shapiro_Capstone/data/RAW_recipes_Food_com.csv',
-                3000
-            )
+                     '/Users/joelshapiro/Documents/WGU/C964/Shapiro_Capstone/data/food_dot_com_processed_data.csv',
+                      50000
+                )
 
         # Simulate progress for loading the dataset
         status_text.text('Loading dataset...')
@@ -93,17 +95,20 @@ if st.button("Find recipes!", type="primary", use_container_width=True):
             progress_bar.progress(i)
 
         progress_bar.progress(100)
-        status_text.text('Data loading complete!')
+        status_text.text('Recipe matching complete!')
         time.sleep(1)
         status_text.empty()
         progress_bar.empty()
 
         # Display the top 10 with radar charts
         display_top_recipes(top_10_recipes, radar_chart_data)
-        # Display Bar Chart below the top 10
-        display_top_recipes_similarity_bar_chart(top_10_recipes)
-        # 3rd Visualization
-        plot_similarity_vs_usage_scatter(top_1000_recipes)
+
+        # Create an expander for the recipe details
+        with st.expander("Supporting Data Visuals", expanded=False):
+            # Display Bar Chart below the top 10
+            display_top_recipes_similarity_bar_chart(top_10_recipes)
+            # 3rd Visualization
+            plot_similarity_vs_usage_scatter(top_1000_recipes)
 
         # Set flag to show reset button
         st.session_state.show_reset_button = True
@@ -112,6 +117,6 @@ if st.button("Find recipes!", type="primary", use_container_width=True):
 
 # Conditionally display the reset button
 if st.session_state.show_reset_button:
-    if st.button('Reset and search again'):
+    if st.button('Reset and search again', type="primary", use_container_width=True):
         reset_query()
         st.rerun()

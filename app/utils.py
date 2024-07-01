@@ -45,6 +45,21 @@ def edit_ingredient_popup():
             del st.session_state['edit_index']
             del st.session_state['edit_ingredient']
 
+
+def format_recipe_steps(recipe_steps_str):
+    # Remove surrounding square brackets and split by comma and space to get individual steps
+    recipe_steps = recipe_steps_str.strip("[]").split("', '")
+
+    # Format each step with a numbered prefix
+    formatted_steps = []
+    for i, step in enumerate(recipe_steps, start=1):
+        # Remove any remaining quotes around steps
+        step = step.strip("'")
+        formatted_steps.append(f"#{i}. {step}")
+
+    return formatted_steps
+
+
 def display_top_recipes(top_10_recipes, radar_chart_data):
     st.header('Top 10 Recipes For You:')
     categories = ['Cosine Similarity Score', 'Leftover Usage Percentage', 'Ingredient Ratio']
@@ -62,30 +77,44 @@ def display_top_recipes(top_10_recipes, radar_chart_data):
 
             # Create an expander for the recipe details
             with st.expander("View Recipe Details", expanded=False):
+                # Description
+                st.write(f"##### Description:")
+                st.write(row['Description'])
+
+                # Steps
+                formatted_steps = format_recipe_steps(row['Steps'])
+                st.write(f"##### How To Make It:")
+                for step in formatted_steps:
+                    st.write(f"  \t {step}")
+
                 # Ingredients list
-                st.write("##### Ingredients:")
+                #ingredients_full = ", ".join(row['Ingredients'])
+                st.write("##### Ingredients: ")
                 st.write(", ".join(row['Ingredients']))
 
                 # Ingredients Intersection
-                st.write("##### Leftovers Used:")
+                #left_used = ", ".join(row['Ingredient Intersection'])
+                st.write("##### Leftovers Used: ")
                 st.write(", ".join(row['Ingredient Intersection']))
 
                 # Unused Leftovers
-                st.write("##### Unused Leftovers:")
                 if row['Unused Leftovers']:
-                    st.write(", ".join(row['Unused Leftovers']))
+                    leftovers = ", ".join(row['Unused Leftovers'])
                 else:
-                    st.write("None!")
+                    leftovers = "None!"
+                st.write("**Unused Leftovers:** " + leftovers)
+
 
                 # Ingredients Needed
-                st.write("##### Ingredients Needed:")
-                st.write(", ".join(row['Ingredients Needed']))
+                ing_needed = ", ".join(row['Ingredients Needed'])
+                st.write("**Ingredients To Buy:** " + ing_needed)
+                #st.write(", ".join(row['Ingredients Needed']))
 
                 # Radar chart for the current recipe
                 radar_data = radar_chart_data.loc[index]
                 fig = go.Figure()
                 fig.add_trace(go.Scatterpolar(
-                    r=[radar_data['Cosine Similarity Score'], radar_data['Leftover Usage Percentage'], radar_data['Ingredient Ratio']],
+                    r=[radar_data['Cosine Similarity Score'], radar_data['Normalized Leftover Usage'], radar_data['Ingredient Ratio']],
                     theta=categories,
                     fill='toself',
                     name=row['Recipe Name']

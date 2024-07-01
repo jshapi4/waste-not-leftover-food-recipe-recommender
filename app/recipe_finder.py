@@ -3,6 +3,7 @@ from sklearn.preprocessing import MultiLabelBinarizer
 from sklearn.metrics.pairwise import cosine_similarity
 from scipy.sparse import csr_matrix
 
+
 def find_top_recipes(recipe_data, leftover_ingredients):
     # Use MultiLabelBinarizer with sparse output to one-hot encode the ingredients
     mlb = MultiLabelBinarizer(sparse_output=True)
@@ -28,7 +29,10 @@ def find_top_recipes(recipe_data, leftover_ingredients):
     similarity_scores = cosine_similarity(leftover_vector, recipe_vectors)
 
     # Add similarity scores to the recipe data
-    recipe_data_exp['Cosine Similarity Score'] = similarity_scores[0]
+    if similarity_scores[0].any:
+        recipe_data_exp['Cosine Similarity Score'] = similarity_scores[0]
+    else:
+        recipe_data_exp['Cosine Similarity Score'] = 0
 
     # Prepare the leftover ingredients as a set
     leftover_set = set(leftover_ingredients)
@@ -62,15 +66,12 @@ def find_top_recipes(recipe_data, leftover_ingredients):
 
     # Include necessary fields for radar chart
     radar_chart_data = top_10_recipes[
-        ['Recipe Name', 'Cosine Similarity Score', 'Combined Score', 'Leftover Usage Percentage', 'Ingredients Needed',
+        ['Recipe Name', 'Cosine Similarity Score', 'Combined Score', 'Normalized Leftover Usage', 'Leftover Usage Percentage', 'Ingredients Needed',
          'Ingredient Intersection', 'Ingredients Use Count', 'Ingredient Ratio']].copy()
-    #radar_chart_data['Ingredients Needed Count'] = radar_chart_data['Ingredients Needed'].apply(len)
-    #radar_chart_data['NumIngredUsed'] = radar_chart_data['Ingredient Intersection'].apply(len)
-    radar_chart_data['Leftover Usage Percentage'] /= 100
-    # radar_chart_data['Ingredient Ratio'] = radar_chart_data['NumIngredUsed'] / (
-    #         radar_chart_data['Ingredients Needed Count'] + radar_chart_data['NumIngredUsed'])
 
     return top_10_recipes, radar_chart_data, top_1000_recipes
+
+
 def calculate_leftover_usage(ingredients, leftover_set):
     ingredients_set = set(ingredients)
     intersection = ingredients_set.intersection(leftover_set)
