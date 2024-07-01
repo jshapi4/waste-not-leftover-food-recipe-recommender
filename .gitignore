@@ -1,2 +1,11 @@
 # ignore the large datasets for git
 data/
+
+# other files to ignore
+.DS_Store
+__pycache__/
+app/.DS_Store
+app/__pycache__/
+
+# ide ignore
+.idea/workspace.xml
