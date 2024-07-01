@@ -1,6 +1,5 @@
 import pandas as pd
 import streamlit as st
-import time
 
 
 def load_and_preprocess_data(file_path, sample_size):

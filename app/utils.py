@@ -1,9 +1,6 @@
 import streamlit as st
-from streamlit_extras.stylable_container import stylable_container
-import seaborn as sns
 import matplotlib.pyplot as plt
 import plotly.graph_objects as go
-import time
 
 
 def delete_ingredient(index):
@@ -71,7 +68,6 @@ def display_top_recipes(top_10_recipes, radar_chart_data):
             col1, col2 = st.columns([3, 1])
             with col1:
                 st.metric(f"#{i}:", f"{row['Recipe Name']}")
-                #st.subheader(f"#{i}: {row['Recipe Name']}")
             with col2:
                 st.metric("Match Score", f"{(row['Combined Score'] * 100):.2f}")
 
@@ -88,12 +84,10 @@ def display_top_recipes(top_10_recipes, radar_chart_data):
                     st.write(f"  \t {step}")
 
                 # Ingredients list
-                #ingredients_full = ", ".join(row['Ingredients'])
                 st.write("##### Ingredients: ")
                 st.write(", ".join(row['Ingredients']))
 
                 # Ingredients Intersection
-                #left_used = ", ".join(row['Ingredient Intersection'])
                 st.write("##### Leftovers Used: ")
                 st.write(", ".join(row['Ingredient Intersection']))
 
