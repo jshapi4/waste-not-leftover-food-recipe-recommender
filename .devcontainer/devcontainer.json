@@ -1,24 +1,28 @@
 {
-  "name": "Streamlit Template from dev container",
-  "image": "ghcr.io/streamlit/basic-template:latest",
+  "name": "Streamlit Development Environment",
+  "image": "mcr.microsoft.com/devcontainers/python:3.11",
+  "postCreateCommand": "pip install -r requirements.txt",
+  "postStartCommand": "streamlit run app/main.py",
   "customizations": {
-    "codespaces": {
-      "openFiles": [
-        "README.md",
-        "streamlit_app.py"
-      ]
+    "vscode": {
+      "extensions": [
+        "ms-python.python",
+        "ms-python.vscode-pylance",
+        "ms-toolsai.jupyter"
+      ],
+      "settings": {
+        "python.defaultInterpreterPath": "/usr/local/bin/python",
+        "python.linting.enabled": true,
+        "python.linting.pylintEnabled": true
+      }
     }
   },
-  "postAttachCommand": {
-    "server": "streamlit run streamlit_app.py --server.enableCORS false --server.enableXsrfProtection false"
-  },
+  "forwardPorts": [8501],
   "portsAttributes": {
     "8501": {
-      "label": "Application",
+      "label": "Streamlit",
       "onAutoForward": "openPreview"
     }
   },
-  "forwardPorts": [
-    8501
-  ]
+  "remoteUser": "vscode"
 }
