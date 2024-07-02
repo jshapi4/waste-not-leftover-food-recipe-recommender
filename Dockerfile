@@ -1,6 +1,5 @@
-# app/Dockerfile
-
 FROM python:3.11
+
 LABEL authors="joelshapiro"
 
 WORKDIR /app
@@ -12,9 +11,9 @@ RUN apt-get update && apt-get install -y \
     git \
     && rm -rf /var/lib/apt/lists/*
 
-RUN git clone https://github.com/jshapi4/waste-not-leftover-food-recipe-recommender.git .
+COPY . .
 
-RUN pip3 install -r requirements.txt
+RUN pip3 install --no-cache-dir -r requirements.txt
 
 EXPOSE 8501
 

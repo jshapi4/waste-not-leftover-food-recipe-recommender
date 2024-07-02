@@ -3,6 +3,7 @@ from data_loader import cached_load_and_preprocess_data
 from recipe_finder import find_top_recipes
 from utils import *
 import time
+from pathlib import Path
 
 # Global variable to hold the data
 recipe_data = None
@@ -64,10 +65,11 @@ if st.button("Find recipes!", type="primary", use_container_width=True):
 
     if st.session_state.leftover_list:
         # Load data only when needed
+        recipe_csv = Path(__file__).parents[1] / 'data/food_dot_com_processed_data.csv'
+        #processed_data = '../data/food_dot_com_processed_data.csv'
         if recipe_data is None:
             recipe_data = cached_load_and_preprocess_data(
-                     '/Users/joelshapiro/Documents/WGU/C964/Shapiro_Capstone/data/food_dot_com_processed_data.csv',
-                      50000
+                     recipe_csv,50000
                 )
 
         # Simulate progress for loading the dataset

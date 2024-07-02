@@ -4,7 +4,7 @@ import streamlit as st
 
 def load_and_preprocess_data(file_path, sample_size):
     # Load the dataset from CSV file
-    # sample ONLY
+    # sample size ONLY
     fdcdf = pd.read_csv(file_path)
     # full data
     # recipe_data = fdcdf
