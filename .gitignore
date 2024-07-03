@@ -1,6 +1,9 @@
 # ignore the large datasets for git
 data/*
 
+# ignore the validation file
+app/validation.py
+
 # other files to ignore
 .DS_Store
 __pycache__/

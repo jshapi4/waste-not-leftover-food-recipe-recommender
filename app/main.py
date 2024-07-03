@@ -35,17 +35,28 @@ def reset_query():
     st.session_state.show_reset_button = False
 
 
+# Function to check for results and return a message if there are no matches
+def process_recipe_search(recipe_data, leftover_ingredients):
+    top_10_recipes, radar_chart_data, top_1000_recipes = find_top_recipes(recipe_data, leftover_ingredients)
+
+    if top_10_recipes is None or top_10_recipes.empty:
+        return "Whoops! No recipe ingredients matched your search. Please try adding more ingredients."
+
+    return top_10_recipes, radar_chart_data, top_1000_recipes
+
+
 # Streamlit app
 st.set_page_config(
-    page_title="Waste Not: Leftover Ingredients Recipe Finder",
-    page_icon="🍽️",
+    page_title="Waste Not: Leftover Ingredients Recipe Finder", # html title
+    page_icon="🍽️", # favicon icon
     layout="centered",
     initial_sidebar_state="expanded",
 )
 
+# hosted on postimg, this is a banner designed in Canva
 banner_url = "https://i.postimg.cc/GpH7Ms1y/waste-not-banner.png"
 st.image(banner_url, caption=None, use_column_width=True)
-st.title('Waste Not: Leftover Ingredients Recipe Finder')
+# st.title('Waste Not: Leftover Ingredients Recipe Finder')
 
 
 # Form for ingredient input
@@ -60,16 +71,17 @@ edit_ingredient_popup()
 
 # Find recipes button and results
 if st.button("Find recipes!", type="primary", use_container_width=True):
-    progress_bar = st.progress(0)
-    status_text = st.empty()
+    if not st.session_state.leftover_list:
+        st.warning('Please add some leftover ingredients to the list!')
+    else:
+        progress_bar = st.progress(0)
+        status_text = st.empty()
 
-    if st.session_state.leftover_list:
-        # Load data only when needed
+        # Load data when needed
         recipe_csv = Path(__file__).parents[1] / 'data/food_dot_com_processed_data.csv'
-        #processed_data = '../data/food_dot_com_processed_data.csv'
-        if recipe_data is None:
+        if recipe_data is None: # if recipe data is not loaded into memory, load it:
             recipe_data = cached_load_and_preprocess_data(
-                     recipe_csv,50000
+                     recipe_csv, 50000
                 )
 
         # Simulate progress for loading the dataset
@@ -87,35 +99,42 @@ if st.button("Find recipes!", type="primary", use_container_width=True):
 
         status_text.text('Calculating the best matches...')
 
-        # Calculate top 10
-        top_10_recipes, radar_chart_data, top_1000_recipes = find_top_recipes(recipe_data, st.session_state.leftover_list)
+        # Process recipe search
+        result = process_recipe_search(recipe_data, st.session_state.leftover_list)
+        # # Calculate top 10
+        # top_10_recipes, radar_chart_data, top_1000_recipes = find_top_recipes(recipe_data, st.session_state.leftover_list)
 
-        progress_bar.progress(60)
 
-        for i in range(60, 100):
-            time.sleep(0.05)
-            progress_bar.progress(i)
+        if isinstance(result, str):
+            status_text.empty()
+            progress_bar.empty()
+            st.warning(result)  # Output the message if no recipes matched
+        else:
+            top_10_recipes, radar_chart_data, top_1000_recipes = result
+            progress_bar.progress(60)
 
-        progress_bar.progress(100)
-        status_text.text('Recipe matching complete!')
-        time.sleep(1)
-        status_text.empty()
-        progress_bar.empty()
+            for i in range(60, 100):
+                time.sleep(0.05)
+                progress_bar.progress(i)
 
-        # Display the top 10 with radar charts
-        display_top_recipes(top_10_recipes, radar_chart_data)
+            progress_bar.progress(100)
+            status_text.text('Recipe matching complete!')
+            time.sleep(1)
+            status_text.empty()
+            progress_bar.empty()
 
-        # Create an expander for the recipe details
-        with st.expander("Supporting Data Visuals", expanded=False):
-            # Display Bar Chart below the top 10
-            display_top_recipes_similarity_bar_chart(top_10_recipes)
-            # 3rd Visualization
-            plot_similarity_vs_usage_scatter(top_1000_recipes)
+            # Display the top 10 with radar charts
+            display_top_recipes(top_10_recipes, radar_chart_data)
 
-        # Set flag to show reset button
-        st.session_state.show_reset_button = True
-    else:
-        st.warning('Please add some leftover ingredients to the list!')
+            # Create an expander for the recipe details
+            with st.expander("Supporting Data Visuals", expanded=False):
+                # Display Bar Chart below the top 10
+                display_top_recipes_similarity_bar_chart(top_10_recipes)
+                # 3rd Visualization
+                plot_similarity_vs_usage_scatter(top_1000_recipes)
+
+            # Set flag to show reset button
+            st.session_state.show_reset_button = True
 
 # Conditionally display the reset button
 if st.session_state.show_reset_button:

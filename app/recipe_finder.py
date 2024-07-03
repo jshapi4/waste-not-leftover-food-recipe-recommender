@@ -10,7 +10,7 @@ def find_top_recipes(recipe_data, leftover_ingredients):
     ingredient_matrix = mlb.fit_transform(recipe_data['Ingredients'])
     f_ingredient_names = mlb.classes_
 
-    # Convert to sparse DataFrame
+    # Convert the ingredient matrix to a sparse DataFrame
     recipe_ingredient_df = pd.DataFrame.sparse.from_spmatrix(ingredient_matrix, columns=f_ingredient_names,
                                                              index=recipe_data.index)
     recipe_data_exp = pd.concat([recipe_data, recipe_ingredient_df], axis=1)
@@ -25,14 +25,19 @@ def find_top_recipes(recipe_data, leftover_ingredients):
     # Extract recipe vectors as sparse matrix
     recipe_vectors = ingredient_matrix
 
-    # Calculate cosine similarity between the leftover vector and recipe vectors
-    similarity_scores = cosine_similarity(leftover_vector, recipe_vectors)
-
-    # Add similarity scores to the recipe data
-    if similarity_scores[0].any:
-        recipe_data_exp['Cosine Similarity Score'] = similarity_scores[0]
-    else:
+    # Check if there are any overlapping ingredients
+    overlapping_ingredients = leftover_vector.columns[leftover_vector.iloc[0].astype(bool)].tolist()
+    if not overlapping_ingredients:
+        # No overlapping ingredients, set similarity score to 0
         recipe_data_exp['Cosine Similarity Score'] = 0
+    else:
+        # Calculate cosine similarity between the leftover vector and recipe vectors
+        similarity_scores = cosine_similarity(leftover_vector, recipe_vectors)
+        recipe_data_exp['Cosine Similarity Score'] = similarity_scores[0]
+
+    # If all similarity scores are zero, return a message
+    if (recipe_data_exp['Cosine Similarity Score'] == 0).all():
+        return None, None, None
 
     # Prepare the leftover ingredients as a set
     leftover_set = set(leftover_ingredients)
@@ -45,7 +50,14 @@ def find_top_recipes(recipe_data, leftover_ingredients):
     recipe_data_exp['Ingredients Needed'] = leftover_usage_data.apply(lambda x: x[3])
 
     # Normalize the scores to the range [0, 1]
-    recipe_data_exp['Normalized Cosine Similarity'] = (recipe_data_exp['Cosine Similarity Score'] - recipe_data_exp['Cosine Similarity Score'].min()) / (recipe_data_exp['Cosine Similarity Score'].max() - recipe_data_exp['Cosine Similarity Score'].min())
+    if recipe_data_exp['Cosine Similarity Score'].max() != recipe_data_exp['Cosine Similarity Score'].min():
+        recipe_data_exp['Normalized Cosine Similarity'] = (
+                (recipe_data_exp['Cosine Similarity Score'] - recipe_data_exp['Cosine Similarity Score'].min()) /
+                (recipe_data_exp['Cosine Similarity Score'].max() - recipe_data_exp['Cosine Similarity Score'].min())
+        )
+    else:
+        recipe_data_exp['Normalized Cosine Similarity'] = 0
+
     recipe_data_exp['Normalized Leftover Usage'] = recipe_data_exp['Leftover Usage Percentage'] / 100
 
     # find the ingredient use ratio
@@ -54,7 +66,11 @@ def find_top_recipes(recipe_data, leftover_ingredients):
     recipe_data_exp['Ingredient Ratio'] = recipe_data_exp['Ingredients Use Count'] / recipe_data_exp['Ingredients'].apply(len)
 
     # Combine the scores with equal weights (1/3 each)
-    recipe_data_exp['Combined Score'] = (recipe_data_exp['Normalized Cosine Similarity'] + recipe_data_exp['Normalized Leftover Usage'] + recipe_data_exp['Ingredient Ratio']) / 3
+    recipe_data_exp['Combined Score'] = (
+            (recipe_data_exp['Normalized Cosine Similarity'] +
+             recipe_data_exp['Normalized Leftover Usage'] +
+             recipe_data_exp['Ingredient Ratio']
+    ) / 3)
 
     # Sort recipes by the combined score in descending order
     sorted_recipes = recipe_data_exp.sort_values(by='Combined Score', ascending=False)

@@ -88,8 +88,9 @@ def display_top_recipes(top_10_recipes, radar_chart_data):
                 st.write(", ".join(row['Ingredients']))
 
                 # Ingredients Intersection
-                st.write("##### Leftovers Used: ")
-                st.write(", ".join(row['Ingredient Intersection']))
+                intersection = ", ".join(row['Ingredient Intersection'])
+                st.write("**Leftovers Used:** " + intersection)
+                #st.write(", ".join(row['Ingredient Intersection']))
 
                 # Unused Leftovers
                 if row['Unused Leftovers']:
@@ -102,7 +103,6 @@ def display_top_recipes(top_10_recipes, radar_chart_data):
                 # Ingredients Needed
                 ing_needed = ", ".join(row['Ingredients Needed'])
                 st.write("**Ingredients To Buy:** " + ing_needed)
-                #st.write(", ".join(row['Ingredients Needed']))
 
                 # Radar chart for the current recipe
                 radar_data = radar_chart_data.loc[index]
