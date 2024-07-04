@@ -21,12 +21,26 @@ if 'show_reset_button' not in st.session_state:
 if 'rerun_trigger' not in st.session_state:
     st.session_state.rerun_trigger = 0
 
+# Load data when needed
+recipe_csv = Path(__file__).parents[1] / 'data/food_dot_com_processed_data.csv'
+if recipe_data is None:
+    recipe_data = cached_load_and_preprocess_data(recipe_csv, 50000)
+    # Extract ingredient names from the data for validation
+    all_ingredients = set()
+    for ingredients in recipe_data['Ingredients']:
+        all_ingredients.update(ingredients)
+    st.session_state.all_ingredients = all_ingredients
 
 # Function to add ingredient to the list
 def add_ingredient():
-    if st.session_state.ingredient_input and st.session_state.ingredient_input not in st.session_state.leftover_list:
-        st.session_state.leftover_list.append(st.session_state.ingredient_input)
-        st.session_state.ingredient_input = ""
+    ingredient = st.session_state.ingredient_input
+    if ingredient:
+        if validate_ingredient(ingredient, st.session_state.all_ingredients):
+            if ingredient not in st.session_state.leftover_list:
+                st.session_state.leftover_list.append(ingredient)
+                st.session_state.ingredient_input = ""
+        else:
+            ingredient_not_found_warning(ingredient)
 
 
 # Function to reset the session state
@@ -101,9 +115,6 @@ if st.button("Find recipes!", type="primary", use_container_width=True):
 
         # Process recipe search
         result = process_recipe_search(recipe_data, st.session_state.leftover_list)
-        # # Calculate top 10
-        # top_10_recipes, radar_chart_data, top_1000_recipes = find_top_recipes(recipe_data, st.session_state.leftover_list)
-
 
         if isinstance(result, str):
             status_text.empty()
