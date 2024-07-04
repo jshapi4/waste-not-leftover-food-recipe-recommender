@@ -48,16 +48,14 @@ def edit_ingredient_popup():
         if update_button:
             if validate_ingredient(new_ingredient, st.session_state.all_ingredients):
                 st.session_state.leftover_list[st.session_state['edit_index']] = new_ingredient
-                st.session_state.edit_index = None  # Clear index
-                st.session_state.edit_ingredient = None  # Clear ingredient
-                st.rerun()  # Rerun to reflect the changes
+                del st.session_state.edit_index
+                del st.session_state.edit_ingredient
+                st.rerun()
             else:
                 ingredient_not_found_warning(new_ingredient)
-                st.session_state.edit_index = None
-                st.session_state.edit_ingredient = None
         elif cancel_button:
-            st.session_state.edit_index = None
-            st.session_state.edit_ingredient = None
+            del st.session_state.edit_index
+            del st.session_state.edit_ingredient
             st.rerun()
 
 
