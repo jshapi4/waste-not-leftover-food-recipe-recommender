@@ -35,7 +35,7 @@ def find_top_recipes(recipe_data, leftover_ingredients):
         similarity_scores = cosine_similarity(leftover_vector, recipe_vectors)
         recipe_data_exp['Cosine Similarity Score'] = similarity_scores[0]
 
-    # If all similarity scores are zero, return a message
+    # If all similarity scores are zero, the app will return a warning
     if (recipe_data_exp['Cosine Similarity Score'] == 0).all():
         return None, None, None
 
