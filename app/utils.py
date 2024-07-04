@@ -6,9 +6,20 @@ import plotly.graph_objects as go
 def delete_ingredient(index):
     st.session_state.leftover_list.pop(index)
 
+
 def edit_ingredient(index):
     st.session_state['edit_index'] = index
     st.session_state['edit_ingredient'] = st.session_state.leftover_list[index]
+
+
+def validate_ingredient(ingredient, all_ingredients):
+    return ingredient in all_ingredients
+
+
+def ingredient_not_found_warning(ingredient):
+    warning = st.warning(f"The ingredient, '{ingredient},' is not in the recipe database. Please try another ingredient.")
+    return warning
+
 
 def display_ingredients_list(ingredients):
     if ingredients:
@@ -22,6 +33,7 @@ def display_ingredients_list(ingredients):
             with col3:
                 st.button('🗑️', key=f'delete_{index}', on_click=delete_ingredient, args=(index,))
 
+
 def edit_ingredient_popup():
     if 'edit_index' in st.session_state:
         with st.form(key='edit_form'):
@@ -34,13 +46,17 @@ def edit_ingredient_popup():
                 cancel_button = st.form_submit_button('Cancel')
 
         if update_button:
-            st.session_state.leftover_list[st.session_state['edit_index']] = new_ingredient
-            del st.session_state['edit_index']
-            del st.session_state['edit_ingredient']
-
-        if cancel_button:
-            del st.session_state['edit_index']
-            del st.session_state['edit_ingredient']
+            if validate_ingredient(new_ingredient, st.session_state.all_ingredients):
+                st.session_state.leftover_list[st.session_state['edit_index']] = new_ingredient
+                del st.session_state.edit_index
+                del st.session_state.edit_ingredient
+                st.rerun()
+            else:
+                ingredient_not_found_warning(new_ingredient)
+        elif cancel_button:
+            del st.session_state.edit_index
+            del st.session_state.edit_ingredient
+            st.rerun()
 
 
 def format_recipe_steps(recipe_steps_str):
