@@ -17,8 +17,11 @@ The dataset from Kaggle includes 179,694 recipes and 177,699 unique ingredients 
 
 ### How to run it on your own machine
 
-1. Install the requirements
+1. Install the requirements by running the following commands in your terminal. First, change into the directory of the app after making sure you are in the directory in which you downloaded the project.
 
+   ```
+   $ cd Shapir
+   ```
    ```
    $ pip install -r requirements.txt
    ```
