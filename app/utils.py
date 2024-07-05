@@ -2,7 +2,6 @@ import streamlit as st
 import matplotlib.pyplot as plt
 import plotly.graph_objects as go
 
-
 def delete_ingredient(index):
     st.session_state.leftover_list.pop(index)
 
@@ -17,7 +16,7 @@ def validate_ingredient(ingredient, all_ingredients):
 
 
 def ingredient_not_found_warning(ingredient):
-    warning = st.warning(f"The ingredient, '{ingredient},' is not in the recipe database. Please try another ingredient.")
+    warning = st.warning(f"The ingredient, '{st.session_state.ingredient_input},' is not in the recipe database. Please try another ingredient.")
     return warning
 
 

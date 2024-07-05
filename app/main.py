@@ -31,9 +31,10 @@ if recipe_data is None:
         all_ingredients.update(ingredients)
     st.session_state.all_ingredients = all_ingredients
 
+
 # Function to add ingredient to the list
 def add_ingredient():
-    ingredient = st.session_state.ingredient_input
+    ingredient = st.session_state.ingredient_input.strip().lower()
     if ingredient:
         if validate_ingredient(ingredient, st.session_state.all_ingredients):
             if ingredient not in st.session_state.leftover_list:
@@ -146,6 +147,26 @@ if st.button("Find recipes!", type="primary", use_container_width=True):
 
             # Set flag to show reset button
             st.session_state.show_reset_button = True
+
+
+# footer for the bottom of the page
+footer="""<style>
+
+.footer {
+position: fixed;
+left: 0;
+bottom: 0;
+width: 100%;
+background-color: white;
+color: grey;
+text-align: center;
+}
+</style>
+<footer class="footer">
+<p>&copy; 2024 Joel Shapiro</p>
+</footer>
+"""
+st.markdown(footer,unsafe_allow_html=True)
 
 # Conditionally display the reset button
 if st.session_state.show_reset_button:
